@@ -369,6 +369,37 @@ meridian balance
 
 ---
 
+## Web dashboard (read-only)
+
+A small built-in web page to monitor the agent from a browser or phone: wallet balance, open positions with live PnL and range bar, closed-position history with cumulative PnL chart, agent decisions (why it deployed / closed / skipped), lessons, and recent logs. It has **no** deploy/close/swap buttons — it cannot move funds. No extra dependencies.
+
+**Enable it** in `.env`:
+
+```
+DASHBOARD_ENABLED=true
+DASHBOARD_PORT=3030
+DASHBOARD_HOST=127.0.0.1
+DASHBOARD_USER=admin
+DASHBOARD_PASSWORD=choose-a-long-password
+```
+
+Then restart the agent (`npm run pm2:restart` or `npm start`). Logs show `[DASHBOARD] Web dashboard running at ...`.
+
+**Open it**
+
+| Where the bot runs | How to open |
+|---|---|
+| Your own PC | `http://localhost:3030` |
+| VPS, private (recommended) | Install [Tailscale](https://tailscale.com) on the VPS and your phone/PC, set `DASHBOARD_HOST=0.0.0.0` + password, open `http://<vps-tailscale-ip>:3030` |
+| VPS, via SSH tunnel | `ssh -L 3030:localhost:3030 user@your-vps`, then open `http://localhost:3030` |
+| VPS, public IP | `DASHBOARD_HOST=0.0.0.0` + password (min 10 chars) + open port 3030 in the firewall. Plain HTTP — prefer Tailscale or put it behind HTTPS (e.g. Cloudflare Tunnel). |
+
+The dashboard refuses to start on a non-localhost host without a password, masks API keys/tokens in the log view, and blocks an IP for 15 minutes after 10 wrong logins.
+
+`npm run dashboard` runs it standalone (without the agent). In that mode positions come from `state.json` without live PnL, because fetching positions also writes `state.json` and two processes must not write it at once.
+
+---
+
 ## Discord listener
 
 The Discord listener watches configured channels (e.g. LP Army) for Solana token calls and queues them as signals for the screener agent.
@@ -651,6 +682,10 @@ tools/
   wallet.js         SOL/token balances + Jupiter swap
   token.js          Token info, holders, narrative
   study.js          Top LPer study via LPAgent API
+
+dashboard/
+  server.js         Read-only web dashboard (node:http, no deps) + JSON API
+  public/           index.html, app.js, style.css
 
 discord-listener/
   index.js          Selfbot Discord listener

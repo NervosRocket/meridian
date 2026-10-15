@@ -36,6 +36,7 @@ import { bootstrapHiveMind, ensureAgentId, getHiveMindPullMode, isHiveMindEnable
 import { appendDecision } from "./decision-log.js";
 
 import { REPO_ROOT, repoPath } from "./repo-root.js";
+import { startDashboard } from "./dashboard/server.js";
 
 const entrypointPath = process.env.pm_exec_path || process.argv[1];
 const indexPath = fileURLToPath(import.meta.url);
@@ -53,6 +54,25 @@ if (isMain) {
   ensureAgentId();
   bootstrapHiveMind().catch((error) => log("hivemind_warn", `Bootstrap failed: ${error.message}`));
   startHiveMindBackgroundSync();
+
+  // Optional read-only web dashboard (DASHBOARD_ENABLED=true in .env).
+  // Never let it take the agent down — any failure is logged and ignored.
+  if (process.env.DASHBOARD_ENABLED === "true") {
+    const startedAt = Date.now();
+    try {
+      startDashboard({
+        getStatus: () => ({
+          startedAt,
+          managementLastRun: timers.managementLastRun,
+          screeningLastRun: timers.screeningLastRun,
+          managementBusy: _managementBusy,
+          screeningBusy: _screeningBusy,
+        }),
+      });
+    } catch (error) {
+      log("dashboard_warn", `Dashboard failed to start: ${error.message}`);
+    }
+  }
 }
 
 const TP_PCT = config.management.takeProfitPct;

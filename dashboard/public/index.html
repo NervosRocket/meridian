@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0b0f14">
+  <title>Meridian Monitor</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>Meridian Monitor</h1>
+        <p class="sub" id="wallet-addr">—</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <span class="badge" id="mode-badge">…</span>
+      <button id="refresh-btn" type="button" title="Ambil data terbaru">Refresh</button>
+    </div>
+  </header>
+
+  <section class="statusbar" id="statusbar" aria-live="polite">
+    <div class="cycle" id="cycle-manage"><span class="dot"></span><span class="lbl">Management</span><span class="val">—</span></div>
+    <div class="cycle" id="cycle-screen"><span class="dot"></span><span class="lbl">Screening</span><span class="val">—</span></div>
+    <div class="updated" id="updated">Memuat…</div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="overview" aria-selected="true">Ringkasan</button>
+    <button role="tab" data-tab="positions">Posisi</button>
+    <button role="tab" data-tab="history">Riwayat</button>
+    <button role="tab" data-tab="decisions">Keputusan</button>
+    <button role="tab" data-tab="lessons">Lessons</button>
+    <button role="tab" data-tab="logs">Log</button>
+  </nav>
+
+  <main>
+    <div id="error-banner" class="banner" hidden></div>
+
+    <!-- RINGKASAN -->
+    <section class="panel" data-panel="overview">
+      <div class="kpis" id="kpis"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-h"><h2>Posisi terbuka</h2><a href="#positions" data-goto="positions" class="link">Detail →</a></div>
+          <div id="overview-positions"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h2>Aktivitas terakhir</h2></div>
+          <ul class="events" id="events"></ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Setting aktif</h2><span class="muted small">dari user-config.json</span></div>
+        <dl class="settings" id="settings"></dl>
+      </div>
+    </section>
+
+    <!-- POSISI -->
+    <section class="panel" data-panel="positions" hidden>
+      <div id="positions-note"></div>
+      <div class="pos-grid" id="positions-list"></div>
+    </section>
+
+    <!-- RIWAYAT -->
+    <section class="panel" data-panel="history" hidden>
+      <div class="card">
+        <div class="card-h"><h2>PnL kumulatif (posisi yang sudah ditutup)</h2><span class="muted small" id="history-summary"></span></div>
+        <div id="pnl-chart" class="chart"></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Posisi ditutup</h2>
+          <select id="history-range" aria-label="Rentang waktu">
+            <option value="24">24 jam</option>
+            <option value="168" selected>7 hari</option>
+            <option value="720">30 hari</option>
+            <option value="0">Semua</option>
+          </select>
+        </div>
+        <div class="table-wrap"><table class="tbl" id="history-table"></table></div>
+      </div>
+    </section>
+
+    <!-- KEPUTUSAN -->
+    <section class="panel" data-panel="decisions" hidden>
+      <div class="filters">
+        <button class="chip active" data-dfilter="all">Semua</button>
+        <button class="chip" data-dfilter="deploy">Deploy</button>
+        <button class="chip" data-dfilter="close">Close</button>
+        <button class="chip" data-dfilter="skip">Skip / No deploy</button>
+      </div>
+      <div id="decisions-list" class="stack"></div>
+    </section>
+
+    <!-- LESSONS -->
+    <section class="panel" data-panel="lessons" hidden>
+      <div id="lessons-list" class="stack"></div>
+    </section>
+
+    <!-- LOG -->
+    <section class="panel" data-panel="logs" hidden>
+      <div class="card">
+        <div class="card-h"><h2>Aksi tool terakhir</h2><span class="muted small">✓ sukses · ✗ gagal</span></div>
+        <div class="table-wrap"><table class="tbl" id="actions-table"></table></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Log agent</h2><input id="log-filter" type="search" placeholder="Filter, mis. error / deploy" aria-label="Filter log"></div>
+        <pre class="log" id="log-lines"></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">Read-only — dashboard ini tidak bisa deploy/close posisi. Aksi tetap lewat Telegram / CLI.</footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
